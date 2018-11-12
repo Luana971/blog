@@ -17,6 +17,7 @@ class LuckyController extends AbstractController
      /**
         * @Route("/lucky/number")
       */
+
     public function number()
     {
         $number = random_int(0, 100);
