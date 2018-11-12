@@ -15,15 +15,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class BlogController extends AbstractController
 {
     /**
-     * @Route("/blog/{slug<[a-z0-9-]+>}", name="blog_show")
+     * @Route("/blog/{slug}", requirements={"page"="[a-z0-9-]+"}, name="blog_show")
      */
 
-    public function show($slug)
+    public function show($slug = "article-sans-titre")
     {
         $result = str_replace("-", " ", $slug);
         $result = ucwords($result);
 
         return $this->render('show.html.twig', ['result' => $result]);
-
     }
 }
