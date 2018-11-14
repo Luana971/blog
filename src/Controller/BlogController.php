@@ -63,14 +63,11 @@ class BlogController extends AbstractController
             ->getRepository(Article::class)
             ->findOneBy(['title' => mb_strtolower($slug)]);
 
-        if (!$article) {
-            throw $this->createNotFoundException(
-                'No article with '.$slug.' title, found in article\'s table.'
-            );
-        }
+        $articleCategory = $article->getCategory();
+
 
         return $this->render(
-            'blog/show.html.twig', ['article' => $article, 'slug' => $slug]);
+            'blog/show.html.twig', ['article' => $article, 'slug' => $slug, 'category' => $articleCategory]);
     }
 
     /**
@@ -82,14 +79,42 @@ class BlogController extends AbstractController
             ->getRepository(Category::class)
             ->findOneByName($category);
 
-        $articles = $this->getDoctrine()
-            ->getRepository(Article::class)
-            ->findBy(
-                array('category' => $category),
-                array('id' => 'DESC'),
-                3
-            );
+        $articles = $category->getArticles();
 
         return $this->render('blog/category.html.twig', ['articles' => $articles, 'category' => $category]);
     }
+
+    /* /**
+     * @Route("/categories/showAll", name="blog_categories")
+     */
+
+    /* public function showCategories()
+    {
+        $categories = $this->getDoctrine()
+            ->getRepository(Category::class)
+            ->findAll();
+
+
+        /* $articles = $this->getDoctrine()
+            ->getRepository(Category::class)
+            ->getArticles();
+
+
+        $articles = $this->getDoctrine()
+            ->getRepository(Article::class)
+            ->findBy(
+                array('category' => $categories)
+            );
+
+        return $this->render('blog/showCategories.html.twig', ['categories' => $categories, 'articles' => $articles]);
+    } */
+
+    /* public function showArticles(string $category)
+    {
+        $articles = $this->getDoctrine()
+            ->getRepository(Category::class)
+            ->getArticles($category);
+
+        return $this->render('blog/showCategories.html.twig', ['articles' => $articles]);
+    } */
 }

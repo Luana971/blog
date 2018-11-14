@@ -19,25 +19,4 @@ class ArticleController extends AbstractController
     /**
      * @Route("/articles")
      */
-
-    public function showArticles($id)
-    {
-        $category = $this->getDoctrine()
-            ->getRepository(Category::class)
-            ->find($id);
-
-        $articles = $category->getArticles();
-
-        return $this->render('showArticles.html.twig', ['articles' => $articles]);
-    }
-
-    /* public function showArticles($id)
-    {
-        $category = new Category();
-        $article = new Article();
-        $categories = $category->getArticles();
-        $articles = $article->getCategory();
-
-        return $this->render('showArticles.html.twig', ['categories' => $categories, 'articles' => $articles]);
-    } */
 }
