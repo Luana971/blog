@@ -13,6 +13,15 @@
         <p>{{ article.content }}</p>
     </div>
 
+    <strong>Tags :</strong>
+    <ul>
+        {% for tag in tags %}
+            <li><a href="/tag/{{ tag.name }}">{{ tag.name }}</a></li>
+        {% else %}
+            <li>No tags for this article</li>
+        {% endfor %}
+    </ul>
+
     <a href="{{ path('homepage') }}">
         Back to homepage.
     </a>

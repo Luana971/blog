@@ -44,7 +44,7 @@ class BlogController extends AbstractController
      *
      * @Route("/{slug<^[a-z0-9-]+$>}",
      *     defaults={"slug" = null},
-     *     name="blog_show")
+     *     name="show_article")
      *  @return Response A response instance
      */
     public function show($slug) : Response
@@ -65,9 +65,11 @@ class BlogController extends AbstractController
 
         $articleCategory = $article->getCategory();
 
+        $articleTag = $article->getTags();
+
 
         return $this->render(
-            'blog/show.html.twig', ['article' => $article, 'slug' => $slug, 'category' => $articleCategory]);
+            'blog/show.html.twig', ['article' => $article, 'slug' => $slug, 'category' => $articleCategory, 'tags' => $articleTag]);
     }
 
     /**
