@@ -8,8 +8,11 @@
 
 namespace App\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Article;
 use App\Entity\Category;
+use App\Form\ArticleSearchType;
+use App\Form\CategoryType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,10 +22,11 @@ class BlogController extends AbstractController
     /**
      * Show all row from article's entity
      *
-     * @Route("/", name="blog_index")
+     * @Route("/blog", name="blog_index")
      * @return Response A response instance
      */
-    public function index() : Response
+
+    public function index(Request $request) : Response
     {
         $articles = $this->getDoctrine()
             ->getRepository(Article::class)
@@ -34,7 +38,16 @@ class BlogController extends AbstractController
             );
         }
 
-        return $this->render('index.html.twig', ['articles' => $articles]);
+        $searchForm = $this->createForm(ArticleSearchType::class);
+        $searchForm->handleRequest($request);
+
+        if ($searchForm->isSubmitted()) {
+            $data = $searchForm->getData();
+            // $data contient les données du $_POST
+            // Faire une recherche dans la BDD avec les infos de $data...
+        }
+
+        return $this->render('index.html.twig', ['articles' => $articles, 'data' => $data, 'searchForm' => $searchForm->createView()]);
     }
 
     /**
