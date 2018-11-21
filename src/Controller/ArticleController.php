@@ -1,22 +1,41 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: luana
- * Date: 13/11/18
- * Time: 10:52
- */
 
 namespace App\Controller;
 
 use App\Entity\Article;
-use App\Entity\Category;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\ArticleType;
 
 class ArticleController extends AbstractController
 {
     /**
-     * @Route("/articles")
+     * @param Request $request
+     * @return Response
+     * @Route("/article/create", name="create_article")
      */
+    public function articleForm(Request $request) : Response
+    {
+        $article = new Article();
+
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $title = $article->getTitle();
+            $article->setTitle($title);
+            $content = $article->getContent();
+            $article->setContent($content);
+            $category = $article->getCategory();
+            $article->setCategory($category);
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($article);
+            $entityManager->flush();
+        }
+
+        return $this->render('blog/createArticle.html.twig', ['form' => $form->createView()]);
+    }
 }

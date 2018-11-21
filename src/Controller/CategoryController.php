@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CategoryController extends AbstractController
 {
-
     /**
      * @param Request $request
      * @return Response

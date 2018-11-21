@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: luana
- * Date: 15/11/18
- * Time: 11:34
+ * Date: 19/11/18
+ * Time: 15:14
  */
 
 namespace App\Form;
@@ -12,8 +12,10 @@ use App\Entity\Category;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Article;
 
-class CategoryType extends AbstractType
+class ArticleType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -21,7 +23,12 @@ class CategoryType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
+        $builder->add('title')
+            ->add('content')
+            ->add('category', EntityType::class, [
+                'class' => Category::class,
+                'choice_label' => 'name',
+            ]);
     }
 
     /**
@@ -30,7 +37,7 @@ class CategoryType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Category::class,
+            'data_class' => Article::class,
         ]);
     }
 }

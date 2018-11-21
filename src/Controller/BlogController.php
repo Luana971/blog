@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Article;
 use App\Entity\Category;
 use App\Form\ArticleSearchType;
-use App\Form\CategoryType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,7 +46,7 @@ class BlogController extends AbstractController
             // Faire une recherche dans la BDD avec les infos de $data...
         }
 
-        return $this->render('index.html.twig', ['articles' => $articles, 'data' => $data, 'searchForm' => $searchForm->createView()]);
+        return $this->render('index.html.twig', ['articles' => $articles, 'searchForm' => $searchForm->createView()]);
     }
 
     /**
