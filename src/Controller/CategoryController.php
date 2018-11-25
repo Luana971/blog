@@ -19,6 +19,16 @@ use Symfony\Component\Routing\Annotation\Route;
 class CategoryController extends AbstractController
 {
     /**
+     * @param Category $category
+     * @return Response
+     * @Route("blog/category/{id}", name="show_category")
+     */
+    public function show(Category $category) : Response
+    {
+        return $this->render('/blog/showCategory.html.twig', ['category'=>$category]);
+    }
+
+    /**
      * @param Request $request
      * @return Response
      * @Route("/blog/category", name="create_category")
