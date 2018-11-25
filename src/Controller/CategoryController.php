@@ -1,55 +1,87 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: luana
- * Date: 15/11/18
- * Time: 15:11
- */
 
 namespace App\Controller;
 
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Category;
 use App\Form\CategoryType;
+use App\Repository\CategoryRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CategoryController extends AbstractController
 {
     /**
-     * @param Category $category
-     * @return Response
-     * @Route("blog/category/{id}", name="show_category")
+     * @Route("/blog/category", name="category_index", methods="GET")
      */
-    public function show(Category $category) : Response
+    public function index(CategoryRepository $categoryRepository): Response
     {
-        return $this->render('/blog/showCategory.html.twig', ['category'=>$category]);
+        return $this->render('category/index.html.twig', ['categories' => $categoryRepository->findAll()]);
     }
 
     /**
-     * @param Request $request
-     * @return Response
-     * @Route("/blog/category", name="create_category")
+     * @Route("/blog/category/new", name="category_new", methods="GET|POST")
      */
-    public function categoryForm(Request $request) : Response
+    public function new(Request $request): Response
     {
         $category = new Category();
-
-        //....
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $name = $category->getName();
-            $category->setName($name);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($category);
+            $em->flush();
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($category);
-            $entityManager->flush();
+            return $this->redirectToRoute('category_index');
         }
 
-        return $this->render('blog/searchCategory.html.twig', ['form' => $form->createView()]);
+        return $this->render('category/new.html.twig', [
+            'category' => $category,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/blog/category/{id}", name="category_show", methods="GET")
+     */
+    public function show(Category $category): Response
+    {
+        return $this->render('category/show.html.twig', ['category' => $category]);
+    }
+
+    /**
+     * @Route("/blog/category/{id}/edit", name="category_edit", methods="GET|POST")
+     */
+    public function edit(Request $request, Category $category): Response
+    {
+        $form = $this->createForm(CategoryType::class, $category);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('category_index', ['id' => $category->getId()]);
+        }
+
+        return $this->render('category/edit.html.twig', [
+            'category' => $category,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/blog/category/{id}", name="category_delete", methods="DELETE")
+     */
+    public function delete(Request $request, Category $category): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($category);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('category_index');
     }
 }
