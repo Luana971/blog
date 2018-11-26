@@ -13,7 +13,7 @@ class Slugify
 {
     public function generate(string $input) : string
     {
-        $result = trim($input);
+        $result = strtolower(trim($input));
         $result = str_replace(' ', '-', $result);
         $result = str_replace(
             array('à','á','â','ã','ä', 'ç', 'è','é','ê','ë', 'ì','í','î','ï', 'ñ', 'ò','ó','ô','õ','ö', 'ù','ú','û','ü',
