@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Service\Slugify;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -16,7 +17,7 @@ class ArticleController extends AbstractController
      * @return Response
      * @Route("/article/create", name="create_article")
      */
-    public function articleForm(Request $request) : Response
+    public function articleForm(Request $request, Slugify $slugify) : Response
     {
         $article = new Article();
 
@@ -32,6 +33,7 @@ class ArticleController extends AbstractController
             $article->setCategory($category);
 
             $entityManager = $this->getDoctrine()->getManager();
+            $article->setSlug($slugify->generate($article->getTitle()));
             $entityManager->persist($article);
             $entityManager->flush();
         }
