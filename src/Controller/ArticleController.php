@@ -3,41 +3,89 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Form\ArticleType;
+use App\Repository\ArticleRepository;
 use App\Service\Slugify;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use App\Form\ArticleType;
+
 
 class ArticleController extends AbstractController
 {
     /**
-     * @param Request $request
-     * @return Response
-     * @Route("/article/create", name="create_article")
+     * @Route("/blog/article", name="article_index", methods="GET")
      */
-    public function articleForm(Request $request, Slugify $slugify) : Response
+    public function index(ArticleRepository $articleRepository): Response
+    {
+        return $this->render('article/index.html.twig', ['articles' => $articleRepository->findAll()]);
+    }
+
+    /**
+     * @Route("/blog/article/new", name="article_new", methods="GET|POST")
+     */
+    public function new(Request $request, Slugify $slugify): Response
     {
         $article = new Article();
-
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $title = $article->getTitle();
-            $article->setTitle($title);
-            $content = $article->getContent();
-            $article->setContent($content);
-            $category = $article->getCategory();
-            $article->setCategory($category);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $slug = $slugify->generate($article->getTitle());
+            $article->setSlug($slug);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($article);
+            $em->flush();
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $article->setSlug($slugify->generate($article->getTitle()));
-            $entityManager->persist($article);
-            $entityManager->flush();
+            return $this->redirectToRoute('article_index');
         }
 
-        return $this->render('blog/createArticle.html.twig', ['form' => $form->createView()]);
+        return $this->render('article/new.html.twig', [
+            'article' => $article,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/blog/article/{id}", name="article_show", methods="GET")
+     */
+    public function show(Article $article): Response
+    {
+        return $this->render('article/show.html.twig', ['article' => $article]);
+    }
+
+    /**
+     * @Route("/blog/article/{id}/edit", name="article_edit", methods="GET|POST")
+     */
+    public function edit(Request $request, Article $article, Slugify $slugify): Response
+    {
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('article_index', ['id' => $article->getId()]);
+        }
+
+        return $this->render('article/edit.html.twig', [
+            'article' => $article,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/blog/article/{id}", name="article_delete", methods="DELETE")
+     */
+    public function delete(Request $request, Article $article): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($article);
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('article_index');
     }
 }
