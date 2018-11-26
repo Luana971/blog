@@ -18,12 +18,11 @@ use Faker;
 
 class ArticleFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager, Slugify $slugify)
     {
         for ($i = 0; $i < 50; $i++)
         {
             $faker  =  Faker\Factory::create('fr_FR');
-            $slug = new Slugify();
 
             $article = new Article();
             $article->setTitle(mb_strtolower($faker->sentence));
@@ -31,7 +30,7 @@ class ArticleFixtures extends Fixture implements DependentFixtureInterface
 
             $manager->persist($article);
             $article->setCategory($this->getReference('category_' . rand(0, 4)));
-            $article->setSlug($slug->generate($article->getTitle()));
+            $article->setSlug($slugify->generate($article->getTitle()));
         }
         $manager->flush();
     }

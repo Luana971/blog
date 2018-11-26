@@ -32,8 +32,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slug = $slugify->generate($article->getTitle());
-            $article->setSlug($slug);
+            $article->setSlug($slugify->generate($article->getTitle()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($article);
             $em->flush();
@@ -64,6 +63,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $article->setSlug($slugify->generate($article->getTitle()));
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('article_index', ['id' => $article->getId()]);
